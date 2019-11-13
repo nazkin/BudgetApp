@@ -27,10 +27,28 @@ var budgetControl = (function() {///////////////////////////////////////////////
 var uiControl = (function() {//////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
+var everythingDOM = {
+    type: '.add__type',
+    description: '.add__description',
+    value: '.add__description',
+    inputBtn: '.add__btn'
+};
 
 
-
-
+//Public function used by central controller to read user input 
+    return {
+        getInput: function() {
+            return {
+                inputType: document.querySelector(everythingDOM.type).value, // + for inc and - for exp
+                inputDescription: document.querySelector(everythingDOM.description).value, // text descriptor
+                inputValue: document.querySelector(everythingDOM.value).value //numerical value
+            };
+        },
+        getDOMvalues: function() {
+            return everythingDOM;
+        }
+    
+};
 
 /////////////////////////////////////////////////////////////////////////////
 })();////////////////////////////////////////////////////////////////////////////
@@ -38,10 +56,12 @@ var uiControl = (function() {//////////////////////////////////////////////////
 var centralControl = (function (uiCtrl,bgtCtrl){//////////////////////////////////////////////
  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+    var infoFromDOM = uiCtrl.getDOMvalues();
+
      var centralAddItem = function() {
         //1) Read Input Data from the fields
-
-
+        var completeInput = uiCtrl.getInput();
+        console.log(completeInput);
         //2) Add Input Item to budgetControl module 
 
 
@@ -52,13 +72,13 @@ var centralControl = (function (uiCtrl,bgtCtrl){////////////////////////////////
 
 
         //5)Display this budget on the UI
-        console.log("Added!");
+        
 
   }
     
-    
+    //Selecting the input button and the enter key for entering user data and calculating it
  
-    document.querySelector('.add__btn').addEventListener('click',centralAddItem ); //Add items on click
+    document.querySelector(infoFromDOM.inputBtn).addEventListener('click',centralAddItem ); //Add items on click
     document.addEventListener('keypress', function(event){//Add items on 'enter'
         if(event.keyCode === 13){
             centralAddItem();
