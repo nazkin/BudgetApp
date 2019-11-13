@@ -27,10 +27,43 @@ var budgetControl = (function() {///////////////////////////////////////////////
             },
 
             totals:{
-                inc: [],
-                exp: []
+                inc: 0,
+                exp: 0
             }
         };
+
+        return {
+        //Allowing other modules to add a value to our     
+            addItem: function(type, desc, val){
+                var newAddition, ID;
+        //Creating an ID for a newly added item
+                if(data.allEntries[type].length > 0 && type === 'inc') {
+                    ID = data.allEntries.inc.length;
+                }
+                else if(data.allEntries[type].length > 0 && type === 'exp') {
+                    ID = data.allEntries.exp.length;
+                }
+                else {
+                    ID = 0;
+                }
+        //Depending on the type we create either an expense or income object
+                if(type === "exp"){
+                    newAddition = new Expenses(ID, desc, val);
+                }
+                else if(type === "inc") {
+                    newAddition = new Income(ID, desc, val);
+                }
+        //Now we need to add the created object to a needed array based off of its type
+               data.allEntries[type].push(newAddition);
+        //Return the newly created object to the global scope       
+               return newAddition;
+            },
+
+            test: function() {
+                console.log(data);
+            }
+        };
+    
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 })();/////////////////////////////////////////////////////////////////////////////////
@@ -43,7 +76,7 @@ var uiControl = (function() {//////////////////////////////////////////////////
 var everythingDOM = {
     type: '.add__type',
     description: '.add__description',
-    value: '.add__description',
+    value: '.add__value',
     inputBtn: '.add__btn'
 };
 
@@ -62,7 +95,8 @@ var everythingDOM = {
 
             return everythingDOM;
         }
-    
+
+      
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,11 +123,12 @@ var centralControl = (function (uiCtrl,bgtCtrl){////////////////////////////////
     
 
      var centralAddItem = function() {
+         var completeInput, newItem;
         //1) Read Input Data from the fields
-        var completeInput = uiCtrl.getInput();
+        completeInput = uiCtrl.getInput();
         
         //2) Add Input Item to budgetControl module 
-
+        newItem = bgtCtrl.addItem(completeInput.inputType, completeInput.inputDescription, completeInput.inputValue);
 
         //3) Add Item to the UI control module 
 
