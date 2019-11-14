@@ -109,6 +109,14 @@ var everythingDOM = {
             document.querySelector(inputElement).insertAdjacentHTML('beforeend', newHTML);
 
         },
+        clearInput: function() {
+            var fieldDesc, fieldVal;
+            fieldDesc = document.querySelector(everythingDOM.description);
+            fieldVal = document.querySelector(everythingDOM.value);
+            fieldDesc.value = "";
+            fieldVal.value = "";
+            document.querySelector(everythingDOM.type).focus();
+        },
 
         getDOMvalues: function() {         //return all DOM values to the global scope such that they can be used everywhere needed
 
@@ -152,10 +160,12 @@ var centralControl = (function (uiCtrl,bgtCtrl){////////////////////////////////
         //3) Add Item to the UI control module 
         uiCtrl.addNewItem(newItem,completeInput.inputType);
 
-        //4)Calculate the Resulting Budget 
+        //4) Clear input fields after entry
+        uiCtrl.clearInput();
+        //5)Calculate the Resulting Budget 
 
 
-        //5)Display this budget on the UI
+        //6)Display this budget on the UI
         
 
   };
