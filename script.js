@@ -37,11 +37,8 @@ var budgetControl = (function() {///////////////////////////////////////////////
             addItem: function(type, desc, val){
                 var newAddition, ID;
         //Creating an ID for a newly added item
-                if(data.allEntries[type].length > 0 && type === 'inc') {
-                    ID = data.allEntries.inc.length;
-                }
-                else if(data.allEntries[type].length > 0 && type === 'exp') {
-                    ID = data.allEntries.exp.length;
+                if(data.allEntries[type].length > 0) {
+                    ID = data.allEntries[type][data.allEntries[type].length -1].id + 1;
                 }
                 else {
                     ID = 0;
