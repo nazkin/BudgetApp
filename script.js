@@ -74,7 +74,9 @@ var everythingDOM = {
     type: '.add__type',
     description: '.add__description',
     value: '.add__value',
-    inputBtn: '.add__btn'
+    inputBtn: '.add__btn',
+    incomeList: '.income__list',
+    expenseList:'.expenses__list'
 };
 
 
@@ -88,6 +90,26 @@ var everythingDOM = {
                 inputValue: document.querySelector(everythingDOM.value).value //numerical value
             };
         },
+        addNewItem: function(obj, type) {
+            var listHTML, newHTML, inputElement;
+            //Create an HTML element with some random text first - income, second - expense
+            if(type === 'inc') {
+                inputElement = everythingDOM.incomeList;
+                listHTML = '<div class="item clearfix" id="income-%id%"><div class="item__description">%description%</div> <div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div> </div> </div>';
+            }
+            else if(type === 'exp') {
+                inputElement = everythingDOM.expenseList;
+                listHTML = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div> <div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+            }
+            //Replace text with information from our data structure 
+            newHTML = listHTML.replace('%id%',obj.id);
+            newHTML = newHTML.replace('%description%', obj.description);
+            newHTML = newHTML.replace('%value%', obj.value);
+            //Move this new element to the DOM 
+            document.querySelector(inputElement).insertAdjacentHTML('beforeend', newHTML);
+
+        },
+
         getDOMvalues: function() {         //return all DOM values to the global scope such that they can be used everywhere needed
 
             return everythingDOM;
@@ -128,7 +150,7 @@ var centralControl = (function (uiCtrl,bgtCtrl){////////////////////////////////
         newItem = bgtCtrl.addItem(completeInput.inputType, completeInput.inputDescription, completeInput.inputValue);
 
         //3) Add Item to the UI control module 
-
+        uiCtrl.addNewItem(newItem,completeInput.inputType);
 
         //4)Calculate the Resulting Budget 
 
