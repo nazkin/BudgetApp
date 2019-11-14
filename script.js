@@ -29,7 +29,17 @@ var budgetControl = (function() {///////////////////////////////////////////////
             totals:{
                 inc: 0,
                 exp: 0
-            }
+            },
+            budgetFinal: 0,
+            percentExp: -1
+        };
+
+       var calcTotals = function(type) {
+            var sum = 0;
+            data.allEntries[type].forEach(function(cur) {
+                sum += cur.value;
+            });
+            data.totals[type] = sum;
         };
 
         return {
@@ -55,7 +65,28 @@ var budgetControl = (function() {///////////////////////////////////////////////
         //Return the newly created object to the global scope       
                return newAddition;
             },
+            calcBudget: function() {
+                //calculate total Incomes and total Expenses
+                calcTotals('inc');
+                calcTotals('exp');
 
+                //Deduce the budget from the totals 
+                data.budgetFinal = data.totals.inc - data.totals.exp;
+                //Calculate the percentage
+                if(data.totals.inc > 0) {
+                    data.percentExp = Math.round((data.totals.exp / data.totals.inc) * 100);
+                }else {
+                    data.percentExp = -1;
+                }
+            },
+            bgtGetter: function() {
+                return {
+                    budget: data.budgetFinal,
+                    totalInc: data.totals.inc,
+                    totalExp: data.totals.exp,
+                    percent: data.percentExp
+                };
+            },
             test: function() {
                 console.log(data);
             }
@@ -87,7 +118,7 @@ var everythingDOM = {
             return {
                 inputType: document.querySelector(everythingDOM.type).value, // + for inc and - for exp
                 inputDescription: document.querySelector(everythingDOM.description).value, // text descriptor
-                inputValue: document.querySelector(everythingDOM.value).value //numerical value
+                inputValue: parseFloat(document.querySelector(everythingDOM.value).value) //numerical value
             };
         },
         addNewItem: function(obj, type) {
@@ -110,6 +141,7 @@ var everythingDOM = {
 
         },
         clearInput: function() {
+            //We Can do it through querySelectorAll() for both fields use Array.prototype.slice.call() to change list to array. Then loop through array and delete
             var fieldDesc, fieldVal;
             fieldDesc = document.querySelector(everythingDOM.description);
             fieldVal = document.querySelector(everythingDOM.value);
@@ -147,14 +179,21 @@ var centralControl = (function (uiCtrl,bgtCtrl){////////////////////////////////
     
     };
 
-    
+    var calcTotalBudget = function() {
+        bgtCtrl.calcBudget();
+        //return out budget from out getter method 
+       var userBgt =  bgtCtrl.bgtGetter();
+       console.log(userBgt);
+    };  
+        
 
      var centralAddItem = function() {
          var completeInput, newItem;
         //1) Read Input Data from the fields
         completeInput = uiCtrl.getInput();
         
-        //2) Add Input Item to budgetControl module 
+        if(completeInput.inputDescription !== "" && !isNaN(completeInput.inputValue) && completeInput.inputValue > 0) {
+         //2) Add Input Item to budgetControl module 
         newItem = bgtCtrl.addItem(completeInput.inputType, completeInput.inputDescription, completeInput.inputValue);
 
         //3) Add Item to the UI control module 
@@ -162,13 +201,17 @@ var centralControl = (function (uiCtrl,bgtCtrl){////////////////////////////////
 
         //4) Clear input fields after entry
         uiCtrl.clearInput();
-        //5)Calculate the Resulting Budget 
 
+        //5)Calculate the Resulting Budge
+            calcTotalBudget();
+        } else {
 
-        //6)Display this budget on the UI
-        
+            uiCtrl.clearInput();
+        }
 
   };
+
+
     
   return {
       init: function() {  //initialization funciton to help us start the program effectively
