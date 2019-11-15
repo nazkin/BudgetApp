@@ -158,6 +158,11 @@ var everythingDOM = {
             document.querySelector(inputElement).insertAdjacentHTML('beforeend', newHTML);
 
         },
+        removeItem: function(selectorID) {
+            var targetElement;
+            targetElement = document.getElementById(selectorID);
+            targetElement.parentNode.removeChild(targetElement);
+        },
        
         clearInput: function() {
             //We Can do it through querySelectorAll() for both fields use Array.prototype.slice.call() to change list to array. Then loop through array and delete
@@ -228,8 +233,9 @@ var centralControl = (function (uiCtrl,bgtCtrl){////////////////////////////////
             //1) Delete from data structure 
             bgtCtrl.removeNewItem(type,idNum);
             //2) Delete from DOM 
-
+            uiCtrl.removeItem(itemID);
             //3) Update budget content
+            calcTotalBudget();
         }
      };
 
