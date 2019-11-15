@@ -18,6 +18,20 @@ var budgetControl = (function() {///////////////////////////////////////////////
         this.id = id;
         this.description = description;
         this.value = value;
+        this.percent = -1;
+        };
+
+        Expenses.prototype.calcPercent = function(totalIncomeValue) {
+            if(totalIncomeValue > 0) {
+                this.percent = Math.round((this.value/totalIncomeValue) * 100);
+            }
+            else{
+                this.percent = -1;
+            }
+        };
+
+        Expenses.prototype.getPercent = function() {
+            return this.percent;
         };
 
 //Our DATA STRUCTURE will include an object containing two identifiers 1)totals - (for total inc and exp) and  2)allEntries -(storing all inc and exp entries)   
@@ -91,6 +105,18 @@ var budgetControl = (function() {///////////////////////////////////////////////
                 }else {
                     data.percentExp = -1;
                 }
+            },
+            calcListPercentages: function() {
+                //Loop our expense data structure and add the percentages to each list item
+                data.allEntries.exp.forEach(function(cur) {
+                   return cur.calcPercent(data.totals.inc);
+                });
+            },
+            retrievePercentages: function() {
+                var allPercent = data.allEntries.exp.map(function(cur) {
+                    return cur.getPercent();
+                });
+                return allPercent;
             },
             bgtGetter: function() {
                 return {
@@ -220,6 +246,14 @@ var centralControl = (function (uiCtrl,bgtCtrl){////////////////////////////////
        //update the DOM values
         uiCtrl.displayBgtData(userBgt);
     };  
+    var updatePercentValues = function() {
+        //Calculate percentage values
+        bgtCtrl.calcListPercentages();
+        //Read these values from our budget control 
+        var percentVal = bgtCtrl.retrievePercentages();
+        //Update the UI accordingly
+        console.log(percentVal);
+    };
         
      var centralDeleteItem = function(event) {
         var itemID, splitID, type, idNum;
@@ -236,6 +270,7 @@ var centralControl = (function (uiCtrl,bgtCtrl){////////////////////////////////
             uiCtrl.removeItem(itemID);
             //3) Update budget content
             calcTotalBudget();
+            //4) Update percent
         }
      };
 
@@ -256,14 +291,16 @@ var centralControl = (function (uiCtrl,bgtCtrl){////////////////////////////////
 
         //5)Calculate the Resulting Budge
             calcTotalBudget();
+
+        //6) Update percent 
+        updatePercentValues();
+        
         } else {
 
             uiCtrl.clearInput();
         }
 
   };
-
-
     
   return {
       init: function() {  //initialization funciton to help us start the program effectively
