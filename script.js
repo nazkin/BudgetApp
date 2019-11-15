@@ -1,6 +1,7 @@
+//Next step: Use event bubbling to set up the delete events in each DOM list element  --> UI
+//           Also we need to delete the items from our data structrure --> budget
 
-
-//FIRST MODULE:CONTROLLER**********************************************************
+//FIRST MODULE:CONTROLLER*******************************************************************************
 var budgetControl = (function() {/////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -65,6 +66,18 @@ var budgetControl = (function() {///////////////////////////////////////////////
         //Return the newly created object to the global scope       
                return newAddition;
             },
+            removeNewItem: function(type, id) {
+                var idArray, idIndex;
+                 idArray = data.allEntries[type].map(function(cur) {
+                    return cur.id;
+               });
+               idIndex = idArray.indexOf(id);
+
+               if(idIndex !== -1) {
+                   data.allEntries[type].splice(idIndex,1);
+               }
+            },
+
             calcBudget: function() {
                 //calculate total Incomes and total Expenses
                 calcTotals('inc');
@@ -111,7 +124,8 @@ var everythingDOM = {
     totalIncome: '.budget__income--value',
     totalExpenses:'.budget__expenses--value',
     totalBgt: '.budget__value',
-    percentOfTotal:'.budget__expenses--percentage'
+    percentOfTotal:'.budget__expenses--percentage',
+    listContainer: '.container'
 };
 
 
@@ -130,11 +144,11 @@ var everythingDOM = {
             //Create an HTML element with some random text first - income, second - expense
             if(type === 'inc') {
                 inputElement = everythingDOM.incomeList;
-                listHTML = '<div class="item clearfix" id="income-%id%"><div class="item__description">%description%</div> <div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div> </div> </div>';
+                listHTML = '<div class="item clearfix" id="inc-%id%"><div class="item__description">%description%</div> <div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div> </div> </div>';
             }
             else if(type === 'exp') {
                 inputElement = everythingDOM.expenseList;
-                listHTML = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div> <div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+                listHTML = '<div class="item clearfix" id="exp-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div> <div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
             }
             //Replace text with information from our data structure 
             newHTML = listHTML.replace('%id%',obj.id);
@@ -144,6 +158,7 @@ var everythingDOM = {
             document.querySelector(inputElement).insertAdjacentHTML('beforeend', newHTML);
 
         },
+       
         clearInput: function() {
             //We Can do it through querySelectorAll() for both fields use Array.prototype.slice.call() to change list to array. Then loop through array and delete
             var fieldDesc, fieldVal;
@@ -189,7 +204,8 @@ var centralControl = (function (uiCtrl,bgtCtrl){////////////////////////////////
             }
 
         });
-    
+        
+        document.querySelector(infoFromDOM.listContainer).addEventListener('click', centralDeleteItem);
     };
 
     var calcTotalBudget = function() {
@@ -200,6 +216,22 @@ var centralControl = (function (uiCtrl,bgtCtrl){////////////////////////////////
         uiCtrl.displayBgtData(userBgt);
     };  
         
+     var centralDeleteItem = function(event) {
+        var itemID, splitID, type, idNum;
+        //traverse our node structure to isolate the div element containing our entire list content
+        itemID = event.target.parentNode.parentNode.parentNode.parentNode.id;
+        if(itemID) {
+            //split up string 'inc-' and '#' returns array of 2 split items
+            splitID = itemID.split('-'); // returns ['inc', '1']
+            type = splitID[0];
+            idNum = parseInt(splitID[1]);
+            //1) Delete from data structure 
+            bgtCtrl.removeNewItem(type,idNum);
+            //2) Delete from DOM 
+
+            //3) Update budget content
+        }
+     };
 
      var centralAddItem = function() {
          var completeInput, newItem;
