@@ -107,7 +107,11 @@ var everythingDOM = {
     value: '.add__value',
     inputBtn: '.add__btn',
     incomeList: '.income__list',
-    expenseList:'.expenses__list'
+    expenseList:'.expenses__list',
+    totalIncome: '.budget__income--value',
+    totalExpenses:'.budget__expenses--value',
+    totalBgt: '.budget__value',
+    percentOfTotal:'.budget__expenses--percentage'
 };
 
 
@@ -149,7 +153,16 @@ var everythingDOM = {
             fieldVal.value = "";
             document.querySelector(everythingDOM.type).focus();
         },
-
+        displayBgtData: function(object) {
+            document.querySelector(everythingDOM.totalBgt).textContent = object.budget;
+            document.querySelector(everythingDOM.totalIncome).textContent = object.totalInc;
+            document.querySelector(everythingDOM.totalExpenses).textContent = object.totalExp;
+            if(object.percent > 0 && object.percent <= 100) {
+                document.querySelector(everythingDOM.percentOfTotal).textContent = object.percent + "%";
+            } else {
+                document.querySelector(everythingDOM.percentOfTotal).textContent = "_-_";
+            }
+        },
         getDOMvalues: function() {         //return all DOM values to the global scope such that they can be used everywhere needed
 
             return everythingDOM;
@@ -183,7 +196,8 @@ var centralControl = (function (uiCtrl,bgtCtrl){////////////////////////////////
         bgtCtrl.calcBudget();
         //return out budget from out getter method 
        var userBgt =  bgtCtrl.bgtGetter();
-       console.log(userBgt);
+       //update the DOM values
+        uiCtrl.displayBgtData(userBgt);
     };  
         
 
@@ -215,9 +229,15 @@ var centralControl = (function (uiCtrl,bgtCtrl){////////////////////////////////
     
   return {
       init: function() {  //initialization funciton to help us start the program effectively
-
-          console.log("Init function works");
           allEventListeners();
+          uiCtrl.displayBgtData({
+            budget: 0,
+            totalInc: 0,
+            totalExp: 0,
+            percent: -1
+          }); 
+
+          
       }
   };
  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
